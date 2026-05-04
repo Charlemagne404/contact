@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Contact Continental about Continental ID, Vanguard, Aegis, Blueprint, Continental Studios, and related projects."
+    >
+    <meta name="theme-color" content="#0b0d10">
+    <meta property="og:title" content="Contact Continental">
+    <meta property="og:description" content="Get in touch about any Continental project.">
+    <meta property="og:type" content="website">
+    <title>Contact Continental</title>
+    <link rel="icon" href="/assets/continental-mark.png" type="image/png">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header" aria-label="Site header">
+        <a class="brand" href="/" aria-label="Contact Continental home">
+          <img src="/assets/continental-mark.webp" alt="" width="42" height="42">
+          <span>Continental</span>
+        </a>
+        <nav class="top-links" aria-label="Header links">
+          <a href="https://continental-hub.com">Hub</a>
+          <a href="https://status.continental-hub.com">Status</a>
+        </nav>
+      </header>
+
+      <main class="main-layout">
+        <section class="intro-panel" aria-labelledby="page-title">
+          <div class="mark-wrap" aria-hidden="true">
+            <img src="/assets/continental-mark.webp" alt="" width="94" height="94">
+          </div>
+          <p class="eyebrow">Shared project contact</p>
+          <h1 id="page-title">Contact Continental</h1>
+          <p class="subtitle">Get in touch about any Continental project.</p>
+
+          <div class="globe-visual" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </section>
+
+        <section class="form-card" aria-label="Contact form">
+          <form id="contact-form" novalidate>
+            <div class="form-row two-column">
+              <label>
+                <span>Project</span>
+                <select name="project" required>
+                  <option value="">Choose a project</option>
+                  <option>General</option>
+                  <option>Continental ID</option>
+                  <option>Vanguard</option>
+                  <option>Aegis</option>
+                  <option>Blueprint</option>
+                  <option>Continental Studios</option>
+                  <option>Grimoire</option>
+                  <option>StepCast</option>
+                  <option>The Echo Archives</option>
+                  <option>Minesweeper</option>
+                  <option>Terra Tread</option>
+                  <option>Sovereign</option>
+                  <option>Other</option>
+                </select>
+              </label>
+
+              <label>
+                <span>Reason</span>
+                <select name="reason" required>
+                  <option value="">Choose a reason</option>
+                  <option>Bug report</option>
+                  <option>Feature request</option>
+                  <option>Support/help</option>
+                  <option>Security issue</option>
+                  <option>Abuse report</option>
+                  <option>Other</option>
+                </select>
+              </label>
+            </div>
+
+            <label>
+              <span>Email <em>optional</em></span>
+              <input name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
+            </label>
+
+            <label class="hp-field" aria-hidden="true">
+              <span>Website</span>
+              <input name="website" type="text" tabindex="-1" autocomplete="off">
+            </label>
+
+            <label>
+              <span>Message</span>
+              <textarea
+                name="message"
+                rows="8"
+                maxlength="3000"
+                required
+                placeholder="Tell me what happened, what you need, or which idea you want to share."
+              ></textarea>
+            </label>
+
+            <div class="form-meta">
+              <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+              <span id="character-count">0 / 3000</span>
+            </div>
+
+            <button class="submit-button" type="submit">
+              <span class="button-label">Send message</span>
+              <span class="button-loader" aria-hidden="true"></span>
+            </button>
+          </form>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>Continental Contact</span>
+        <nav aria-label="Footer links">
+          <a href="https://continental-hub.com">Continental Hub</a>
+          <a href="https://status.continental-hub.com">Status</a>
+          <a href="/privacy">Privacy</a>
+        </nav>
+      </footer>
+    </div>
+  </body>
+</html>
