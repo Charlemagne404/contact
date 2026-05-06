@@ -1,4 +1,5 @@
 const path = require("path");
+const { randomUUID } = require("crypto");
 
 require("dotenv").config();
 
@@ -7,6 +8,7 @@ const rateLimit = require("express-rate-limit");
 
 const app = express();
 const port = Number.parseInt(process.env.PORT, 10) || 3000;
+const publicDir = path.join(__dirname, "public");
 
 const PROJECT_OPTIONS = [
   "General",
@@ -40,13 +42,27 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 app.disable("x-powered-by");
 
 app.use((req, res, next) => {
+  req.requestId = randomUUID();
+  res.setHeader("X-Request-Id", req.requestId);
+  next();
+});
+
+app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
   );
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+  res.setHeader("Permissions-Policy", "camera=(), geolocation=(), microphone=()");
+
+  if (req.secure || req.get("x-forwarded-proto") === "https") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+
   next();
 });
 
@@ -55,11 +71,11 @@ app.use(express.urlencoded({ extended: false, limit: "16kb" }));
 
 app.use((error, req, res, next) => {
   if (error.type === "entity.too.large") {
-    return res.status(413).json({ error: "Request body is too large." });
+    return res.status(413).json({ error: "Request body is too large.", requestId: req.requestId });
   }
 
   if (error instanceof SyntaxError) {
-    return res.status(400).json({ error: "Request body must be valid JSON." });
+    return res.status(400).json({ error: "Request body must be valid JSON.", requestId: req.requestId });
   }
 
   return next(error);
@@ -70,7 +86,12 @@ const contactLimiter = rateLimit({
   limit: 3,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: "Too many submissions. Please wait a few minutes and try again." },
+  handler: (req, res, next, options) => {
+    res.status(options.statusCode).json({
+      error: "Too many submissions. Please wait a few minutes and try again.",
+      requestId: req.requestId,
+    });
+  },
 });
 
 app.post("/api/contact", contactLimiter, async (req, res) => {
@@ -78,7 +99,8 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   const website = normalizeText(body.website);
 
   if (website) {
-    return res.status(400).json({ error: "Submission rejected as likely spam." });
+    logWithRequestId("warn", req.requestId, "Submission rejected by honeypot.");
+    return res.status(400).json({ error: "Submission rejected as likely spam.", requestId: req.requestId });
   }
 
   const project = normalizeText(body.project);
@@ -87,30 +109,33 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
   const message = normalizeMessage(body.message);
 
   if (!project || !reason || !message) {
-    return res.status(400).json({ error: "Project, reason, and message are required." });
+    return res.status(400).json({ error: "Project, reason, and message are required.", requestId: req.requestId });
   }
 
   if (!projectSet.has(project)) {
-    return res.status(400).json({ error: "Please choose a valid project." });
+    return res.status(400).json({ error: "Please choose a valid project.", requestId: req.requestId });
   }
 
   if (!reasonSet.has(reason)) {
-    return res.status(400).json({ error: "Please choose a valid reason." });
+    return res.status(400).json({ error: "Please choose a valid reason.", requestId: req.requestId });
   }
 
   if (message.length > 3000) {
-    return res.status(400).json({ error: "Message must be 3000 characters or fewer." });
+    return res.status(400).json({ error: "Message must be 3000 characters or fewer.", requestId: req.requestId });
   }
 
   if (email && (email.length > 254 || !emailPattern.test(email))) {
-    return res.status(400).json({ error: "Please enter a valid email address or leave it blank." });
+    return res.status(400).json({ error: "Please enter a valid email address or leave it blank.", requestId: req.requestId });
   }
 
   const webhookUrl = process.env.DISCORD_CONTACT_WEBHOOK_URL;
 
   if (!webhookUrl) {
-    console.error("Contact webhook is not configured.");
-    return res.status(500).json({ error: "Contact webhook is not configured." });
+    logWithRequestId("error", req.requestId, "Contact webhook is not configured.");
+    return res.status(500).json({
+      error: "Message could not be delivered. Please try again later.",
+      requestId: req.requestId,
+    });
   }
 
   try {
@@ -119,29 +144,48 @@ app.post("/api/contact", contactLimiter, async (req, res) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(buildDiscordPayload({ project, reason, email, message })),
+      body: JSON.stringify(buildDiscordPayload({ requestId: req.requestId, project, reason, email, message })),
     });
 
     if (!response.ok) {
-      console.error(`Discord webhook failed with status ${response.status}.`);
-      return res.status(502).json({ error: "Message could not be delivered. Please try again later." });
+      logWithRequestId("error", req.requestId, `Discord webhook failed with status ${response.status}.`);
+      return res.status(502).json({
+        error: "Message could not be delivered. Please try again later.",
+        requestId: req.requestId,
+      });
     }
 
-    return res.json({ success: true });
+    logWithRequestId("info", req.requestId, `Submission accepted for ${project} (${reason}).`);
+    return res.json({ success: true, requestId: req.requestId });
   } catch (error) {
-    console.error("Discord webhook request failed.");
-    return res.status(502).json({ error: "Message could not be delivered. Please try again later." });
+    logWithRequestId("error", req.requestId, "Discord webhook request failed.", error);
+    return res.status(502).json({
+      error: "Message could not be delivered. Please try again later.",
+      requestId: req.requestId,
+    });
   }
 });
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(publicDir));
+
+app.get("/privacy", (req, res) => {
+  res.sendFile(path.join(publicDir, "privacy.html"));
+});
+
+app.get("/terms", (req, res) => {
+  res.sendFile(path.join(publicDir, "terms.html"));
+});
 
 app.use("/api", (req, res) => {
-  res.status(404).json({ error: "API route not found." });
+  res.status(404).json({ error: "API route not found.", requestId: req.requestId });
+});
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
 });
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.status(404).sendFile(path.join(publicDir, "404.html"));
 });
 
 function normalizeText(value) {
@@ -164,7 +208,7 @@ function cleanForDiscord(value) {
     .trim();
 }
 
-function buildDiscordPayload({ project, reason, email, message }) {
+function buildDiscordPayload({ requestId, project, reason, email, message }) {
   const messageFields = chunkText(cleanForDiscord(message), 1000).map((chunk, index) => ({
     name: index === 0 ? "Message" : `Message continued ${index + 1}`,
     value: chunk,
@@ -181,6 +225,7 @@ function buildDiscordPayload({ project, reason, email, message }) {
         title: "New Continental Contact Message",
         color: 3447003,
         fields: [
+          { name: "Request ID", value: cleanForDiscord(requestId), inline: false },
           { name: "Project", value: cleanForDiscord(project), inline: true },
           { name: "Reason", value: cleanForDiscord(reason), inline: true },
           { name: "Email", value: email ? cleanForDiscord(email) : "Not provided", inline: false },
@@ -203,6 +248,22 @@ function chunkText(value, maxLength) {
   }
 
   return chunks.length > 0 ? chunks : ["Not provided"];
+}
+
+function logWithRequestId(level, requestId, message, error) {
+  const prefix = `[contact:${requestId}] ${message}`;
+
+  if (level === "error") {
+    console.error(error ? `${prefix} ${error.message || error}` : prefix);
+    return;
+  }
+
+  if (level === "warn") {
+    console.warn(prefix);
+    return;
+  }
+
+  console.info(prefix);
 }
 
 if (require.main === module) {

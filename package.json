@@ -13,7 +13,7 @@
     "discord-webhook"
   ],
   "author": "Continental",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "node": ">=18"
   },

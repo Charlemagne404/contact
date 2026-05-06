@@ -3,18 +3,39 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index,follow">
     <meta
       name="description"
       content="Contact Continental about Continental ID, Vanguard, Aegis, Blueprint, Continental Studios, and related projects."
     >
     <meta name="theme-color" content="#0b0d10">
+    <meta name="format-detection" content="telephone=no">
     <meta property="og:title" content="Contact Continental">
     <meta property="og:description" content="Get in touch about any Continental project.">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://contact.continental-hub.com/">
     <title>Contact Continental</title>
-    <link rel="icon" href="/assets/continental-mark.png" type="image/png">
+    <link rel="canonical" href="https://contact.continental-hub.com/">
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="alternate" type="application/json" href="/data.json" title="Site metadata">
     <link rel="stylesheet" href="/styles.css">
     <script src="/app.js" defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Contact Continental",
+        "url": "https://contact.continental-hub.com/",
+        "description": "Shared project contact site for Continental projects.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "Continental",
+          "url": "https://continental-hub.com"
+        }
+      }
+    </script>
   </head>
   <body>
     <div class="page-shell">
@@ -45,12 +66,27 @@
           </div>
         </section>
 
-        <section class="form-card" aria-label="Contact form">
+        <section class="form-card" aria-labelledby="form-title">
           <form id="contact-form" novalidate>
+            <div class="form-heading">
+              <h2 id="form-title">Send a message</h2>
+            </div>
+
+            <div class="priority-links" aria-label="Priority reporting">
+              <button class="priority-link" type="button" data-prefill-reason="Security issue">
+                <strong>Security issue</strong>
+                <span>Priority review.</span>
+              </button>
+              <button class="priority-link" type="button" data-prefill-reason="Abuse report">
+                <strong>Abuse report</strong>
+                <span>Platform misuse.</span>
+              </button>
+            </div>
+
             <div class="form-row two-column">
-              <label>
-                <span>Project</span>
-                <select name="project" required>
+              <div class="field">
+                <label class="field-label" for="project">Project</label>
+                <select id="project" name="project" required aria-describedby="project-error">
                   <option value="">Choose a project</option>
                   <option>General</option>
                   <option>Continental ID</option>
@@ -66,11 +102,12 @@
                   <option>Sovereign</option>
                   <option>Other</option>
                 </select>
-              </label>
+                <p id="project-error" class="field-error"></p>
+              </div>
 
-              <label>
-                <span>Reason</span>
-                <select name="reason" required>
+              <div class="field">
+                <label class="field-label" for="reason">Reason</label>
+                <select id="reason" name="reason" required aria-describedby="reason-error reason-guidance">
                   <option value="">Choose a reason</option>
                   <option>Bug report</option>
                   <option>Feature request</option>
@@ -79,29 +116,46 @@
                   <option>Abuse report</option>
                   <option>Other</option>
                 </select>
-              </label>
+                <p id="reason-error" class="field-error"></p>
+              </div>
             </div>
 
-            <label>
-              <span>Email <em>optional</em></span>
-              <input name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
-            </label>
+            <div id="reason-guidance" class="reason-guidance" hidden></div>
 
-            <label class="hp-field" aria-hidden="true">
+            <div class="field">
+              <label class="field-label" for="email">Email <em>optional</em></label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                inputmode="email"
+                placeholder="you@example.com"
+                aria-describedby="email-hint email-error"
+              >
+              <p id="email-hint" class="field-hint">For follow-up only.</p>
+              <p id="email-error" class="field-error"></p>
+            </div>
+
+            <label class="hp-field" for="website" aria-hidden="true">
               <span>Website</span>
-              <input name="website" type="text" tabindex="-1" autocomplete="off">
+              <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
             </label>
 
-            <label>
-              <span>Message</span>
+            <div class="field">
+              <label class="field-label" for="message">Message</label>
               <textarea
+                id="message"
                 name="message"
                 rows="8"
                 maxlength="3000"
                 required
+                aria-describedby="message-hint message-error character-count"
                 placeholder="Tell me what happened, what you need, or which idea you want to share."
               ></textarea>
-            </label>
+              <p id="message-hint" class="field-hint">Links and timestamps help.</p>
+              <p id="message-error" class="field-error"></p>
+            </div>
 
             <div class="form-meta">
               <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
@@ -122,6 +176,7 @@
           <a href="https://continental-hub.com">Continental Hub</a>
           <a href="https://status.continental-hub.com">Status</a>
           <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
         </nav>
       </footer>
     </div>

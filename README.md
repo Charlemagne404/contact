@@ -94,3 +94,30 @@ PORT=<provider port, if required>
 ```
 
 The frontend should keep using `/api/contact` so it works on the same origin in local development and production.
+
+This repo now includes the common public site files expected for deployment:
+
+- `public/index.html`
+- `public/robots.txt`
+- `public/sitemap.xml`
+- `public/manifest.json`
+- `public/404.html`
+- `public/favicon.png`
+- `public/favicon.svg`
+- `public/privacy.html`
+- `public/terms.html`
+- `public/data.json`
+
+Items from the checklist that are intentionally not in this repo:
+
+- `index.php` or other PHP entrypoints are not needed because the site runs on Express/Node.
+- `.htaccess` is not needed unless you deploy behind Apache.
+- SSL/TLS certificates are not stored in the repo; they must be configured on the hosting platform or reverse proxy.
+
+## Recent Improvements
+
+- `/privacy` now serves a dedicated privacy page instead of falling through to the contact page
+- the form shows field-level validation errors and accessible error states
+- priority actions prefill the form for `Security issue` and `Abuse report`
+- API responses now include a request ID for support/debugging
+- webhook misconfiguration is logged server-side without exposing internal details to end users
