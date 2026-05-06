@@ -10,8 +10,6 @@ if (form) {
   const reasonInput = document.querySelector("#reason");
   const emailInput = document.querySelector("#email");
   const messageInput = document.querySelector("#message");
-  const priorityLinks = document.querySelectorAll("[data-prefill-reason]");
-
   const fields = {
     project: {
       input: projectInput,
@@ -177,12 +175,6 @@ if (form) {
       const payload = normalizePayload();
       const errors = validatePayload(payload);
       setFieldError(name, errors[name] || "");
-    });
-  });
-
-  priorityLinks.forEach((button) => {
-    button.addEventListener("click", () => {
-      applyReasonPrefill(button.dataset.prefillReason || "");
     });
   });
 
