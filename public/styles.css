@@ -226,25 +226,20 @@ h1 {
 
 form {
   display: grid;
-  gap: 20px;
-  padding: clamp(22px, 4vw, 36px);
+  gap: 16px;
+  padding: clamp(18px, 3.2vw, 28px);
 }
 
-.form-heading {
-  display: grid;
-  gap: 4px;
-}
-
-.form-heading h2,
+.form-title,
 .policy-section h2 {
   margin: 0;
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.35rem, 2.4vw, 1.7rem);
   line-height: 1.1;
 }
 
 .form-row {
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 
 .two-column {
@@ -254,7 +249,7 @@ form {
 .field,
 label {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .field-label,
@@ -288,15 +283,15 @@ textarea {
 
 input,
 select {
-  min-height: 48px;
-  padding: 0 14px;
+  min-height: 44px;
+  padding: 0 12px;
 }
 
 textarea {
-  min-height: 190px;
+  min-height: 160px;
   max-height: 420px;
   resize: vertical;
-  padding: 14px;
+  padding: 12px;
   line-height: 1.5;
 }
 
@@ -343,8 +338,8 @@ textarea:focus {
 .field-error,
 .reason-guidance {
   margin: 0;
-  font-size: 0.88rem;
-  line-height: 1.5;
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .field-hint {
@@ -356,7 +351,7 @@ textarea:focus {
 }
 
 .reason-guidance {
-  padding: 14px 16px;
+  padding: 12px 14px;
   border: 1px solid rgba(214, 189, 123, 0.22);
   border-radius: 8px;
   color: var(--muted-strong);
@@ -364,13 +359,13 @@ textarea:focus {
 }
 
 .form-meta {
-  min-height: 26px;
+  min-height: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   color: var(--muted);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
 }
 
 .status-message {
@@ -387,11 +382,11 @@ textarea:focus {
 }
 
 .submit-button {
-  min-height: 54px;
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   border: 0;
   border-radius: 8px;
   color: #15130d;

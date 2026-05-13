@@ -68,9 +68,7 @@
 
         <section class="form-card" aria-labelledby="form-title">
           <form id="contact-form" novalidate>
-            <div class="form-heading">
-              <h2 id="form-title">Send a message</h2>
-            </div>
+            <h2 id="form-title" class="form-title">Send a message</h2>
 
             <div class="form-row two-column">
               <div class="field">
@@ -120,9 +118,8 @@
                 autocomplete="email"
                 inputmode="email"
                 placeholder="you@example.com"
-                aria-describedby="email-hint email-error"
+                aria-describedby="email-error"
               >
-              <p id="email-hint" class="field-hint">For follow-up only.</p>
               <p id="email-error" class="field-error"></p>
             </div>
 
@@ -136,13 +133,12 @@
               <textarea
                 id="message"
                 name="message"
-                rows="8"
+                rows="7"
                 maxlength="3000"
                 required
-                aria-describedby="message-hint message-error character-count"
+                aria-describedby="message-error character-count"
                 placeholder="Tell me what happened, what you need, or which idea you want to share."
               ></textarea>
-              <p id="message-hint" class="field-hint">Links and timestamps help.</p>
               <p id="message-error" class="field-error"></p>
             </div>
 
